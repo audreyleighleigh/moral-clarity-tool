@@ -417,7 +417,7 @@ export default function App() {
               <button className="bg np" onClick={() => setPhase("primer")}>Read the primer first</button>
               <button className="bp" onClick={startSteps}>Begin Audit →</button>
             </div>
-            <p style={{ fontSize: ".73rem", color: faint }}>9 questions · ~5 min · no AI</p>
+            <p style={{ fontSize: ".73rem", color: faint }}>9 questions · ~5 min · no AI · nothing is saved or transmitted</p>
           </div>
         )}
 
