@@ -7,19 +7,19 @@ const STEPS = [
   {
     id: "concern", num: "01", chapter: "Scope",
     title: "What are you critiquing?",
-    subtitle: "Be specific. A technology, a company, an industry, a practice. Vague concern is hard to act on.",
+    subtitle: "Be as specific as you can. Name a technology, a company, an industry, or a practice. The more concrete your starting point, the more useful this exercise will be.",
     type: "text", placeholder: "e.g. AI data centers' energy consumption"
   },
   {
     id: "structural_twin", num: "02", chapter: "Scope",
     title: "Name something structurally identical that gets less attention.",
-    subtitle: "Same harm category, different visibility. If you can't name one, that's data. If you can but feel differently, that's worth sitting with.",
+    subtitle: "Think of something that causes the same kind of harm, through similar mechanisms, but doesn't receive the same level of attention or outrage. If nothing comes to mind, that's worth noting. If something does, but you feel differently about it, that gap is what this question is designed to surface.",
     type: "text", placeholder: "e.g. cobalt mining for EV batteries and laptops"
   },
   {
     id: "feeling_diff", num: "03", chapter: "Scope",
     title: "Do you feel the same way about both?",
-    subtitle: "No judgment. Noticing the gap is the whole point.",
+    subtitle: "No judgment either way. The goal is simply to notice whether your concern applies evenly, or whether one case activates you more than the other.",
     type: "choice",
     options: [
       { value: "same", label: "Yes, my concern is consistent" },
@@ -30,7 +30,7 @@ const STEPS = [
   {
     id: "bias_flags", num: "04", chapter: "Bias Check",
     title: "Which of these might be shaping your concern?",
-    subtitle: "Check everything that could apply. These are universal cognitive patterns, not accusations.",
+    subtitle: "Check everything that might apply. These are well-documented patterns that affect how everyone processes moral concern. Flagging them isn't self-criticism. It's just accuracy.",
     type: "multiselect",
     options: [
       {
@@ -74,20 +74,20 @@ const STEPS = [
   {
     id: "counterfactual", num: "05", chapter: "Analysis",
     title: "If this didn't exist, what would?",
-    subtitle: "Most critiques assume the alternative is clean. Rarely true. What actually fills the gap?",
+    subtitle: "Most critiques assume that if the target disappeared, things would simply be better. That assumption is often wrong. What would realistically fill the space? What would people turn to instead?",
     type: "text", placeholder: "e.g. more fossil fuel infrastructure, worse labor conditions elsewhere..."
   },
   {
     id: "who_profits", num: "06", chapter: "Analysis",
     title: "Who benefits from your outrage?",
     primer: "Every platform, publication, and political faction has a financial incentive to keep you activated. Anger drives engagement. Engagement drives revenue. This isn't conspiracy. It's the business model. Your outrage is a product being sold.",
-    subtitle: "Name the specific players: platforms, industries, politicians, media outlets.",
+    subtitle: "Try to name them specifically. Which platforms, publications, industries, or political actors have a financial or strategic interest in keeping you activated around this particular issue?",
     type: "text", placeholder: "e.g. the competing platform, the politician who needs an enemy, the outlet that monetizes anger..."
   },
   {
     id: "action", num: "07", chapter: "Action",
     title: "What are you actually doing about this?",
-    subtitle: "Not judging the answer. Just mapping the gap between concern and action.",
+    subtitle: "There's no right answer here. The question is just about mapping the distance between what you feel and what you're actually doing.",
     type: "choice",
     options: [
       { value: "voicing", label: "Posting, talking, sharing outrage online" },
@@ -99,13 +99,13 @@ const STEPS = [
   {
     id: "leverage", num: "08", chapter: "Action",
     title: "What would actually move the needle?",
-    subtitle: "Not what feels good. What has a realistic causal path to the change you want?",
+    subtitle: "Set aside what would feel satisfying to do. What action actually has a plausible, realistic path to producing the change you care about?",
     type: "text", placeholder: "e.g. specific legislation, shifting procurement, funding alternatives..."
   },
   {
     id: "agency", num: "09", chapter: "Action",
     title: "What's within your actual power?",
-    subtitle: "Outrage often targets things with zero personal leverage. What can you actually change from where you stand?",
+    subtitle: "Concern is often directed at things we have no ability to influence. Setting aside what should happen, what's genuinely within your reach, given your specific role, resources, and access?",
     type: "text", placeholder: "e.g. my purchasing, my professional choices, my local policy environment..."
   },
 ];
@@ -116,7 +116,7 @@ const biasOptionMap = Object.fromEntries(
 
 const CONSISTENCY = {
   same: { label: "Consistent Scope", color: "#4a7c59", bg: "rgba(74,124,89,0.08)", text: "You're applying concern consistently across structurally similar cases. That's less common than it sounds, and it makes your critique harder to dismiss. The question now is whether your actions match your stated values." },
-  different: { label: "Selective Attention", color: "#b07d2e", bg: "rgba(176,125,46,0.08)", text: "You feel more strongly about one case than a structurally similar one. This might reflect genuine differences in scale or urgency, or it might be visibility bias. The twin you named is worth sitting with." },
+  different: { label: "Selective Attention", color: "#b07d2e", bg: "rgba(176,125,46,0.08)", text: "You feel more strongly about one case than a structurally similar one. This might reflect genuine differences in scale or urgency, or it might be a visibility effect. The parallel case you named is worth returning to." },
   unsure: { label: "Open Question", color: "#3a6ea8", bg: "rgba(58,110,168,0.08)", text: "Honest uncertainty is a useful starting point. The structurally identical case might be meaningfully different in ways you haven't articulated yet. Or the discomfort of not knowing might be pointing at something real." },
 };
 
@@ -407,8 +407,8 @@ export default function App() {
         {phase === "intro" && (
           <div className="au">
             <p style={{ fontFamily: serif, fontSize: "1.05rem", lineHeight: 1.85, color: "#444", marginBottom: "1.25rem", fontStyle: "italic" }}>Outrage is easy. Consistent, actionable concern is harder.</p>
-            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: ".75rem" }}>This tool helps you examine the scope and leverage of a moral critique: not to dismiss it, but to sharpen it. Nine questions covering consistency, cognitive bias, counterfactuals, and real leverage.</p>
-            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: "2rem" }}>At the end you'll get a clear statement of your actual position, built from your own answers, no AI involved. Plus tools to share or print it.</p>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: ".75rem" }}>This tool walks you through nine questions designed to sharpen a moral critique, not dismiss it. You'll look at whether your concern is applied consistently, which cognitive patterns might be shaping it, what the realistic alternatives are, and where you actually have influence over the outcome.</p>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: "2rem" }}>At the end, you'll have a written statement of your actual position, assembled from your own answers. No AI, no processing behind the scenes. You can copy, print, or share it from there.</p>
             <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", marginBottom: "2rem" }}>
               {chapters.map(ch => <span key={ch} style={{ fontSize: ".62rem", letterSpacing: ".12em", textTransform: "uppercase", border: "1px solid #ccc9c0", padding: ".28rem .65rem", color: "#999" }}>{ch}</span>)}
             </div>
