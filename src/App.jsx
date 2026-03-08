@@ -2,20 +2,20 @@ import { useState } from "react";
 
 const STEPS = [
   { id: "concern", num: "01", chapter: "Scope", title: "What are you critiquing?", subtitle: "Be specific. A technology, a company, an industry, a practice. Vague concern is hard to act on.", type: "text", placeholder: "e.g. AI data centers' energy consumption" },
-  { id: "structural_twin", num: "02", chapter: "Scope", title: "Name something structurally identical that gets less attention.", subtitle: "Same harm category, different visibility. If you can't name one — that's data. If you can but feel differently — that's more.", type: "text", placeholder: "e.g. cobalt mining for EV batteries and laptops" },
-  { id: "feeling_diff", num: "03", chapter: "Scope", title: "Do you feel the same way about both?", subtitle: "No judgment. Noticing the gap is the whole point.", type: "choice", options: [{ value: "same", label: "Yes — my concern is consistent" }, { value: "different", label: "No — I feel more strongly about the first" }, { value: "unsure", label: "Honestly not sure" }] },
-  { id: "bias_flags", num: "04", chapter: "Bias Check", title: "Which of these might be shaping your concern?", subtitle: "Check everything that could apply. These are universal cognitive patterns — not accusations.", type: "multiselect", options: [
+  { id: "structural_twin", num: "02", chapter: "Scope", title: "Name something structurally identical that gets less attention.", subtitle: "Same harm category, different visibility. If you can't name one, that's data. If you can but feel differently, that's worth sitting with.", type: "text", placeholder: "e.g. cobalt mining for EV batteries and laptops" },
+  { id: "feeling_diff", num: "03", chapter: "Scope", title: "Do you feel the same way about both?", subtitle: "No judgment. Noticing the gap is the whole point.", type: "choice", options: [{ value: "same", label: "Yes, my concern is consistent" }, { value: "different", label: "No, I feel more strongly about the first" }, { value: "unsure", label: "Honestly not sure" }] },
+  { id: "bias_flags", num: "04", chapter: "Bias Check", title: "Which of these might be shaping your concern?", subtitle: "Check everything that could apply. These are universal cognitive patterns, not accusations.", type: "multiselect", options: [
     { value: "identifiable_victim", label: "Identifiable victim effect", desc: "The harm feels more real because it has a face or story. We respond more to one named person than to 10,000 statistics." },
     { value: "moral_licensing", label: "Moral licensing", desc: "Caring about this gives psychological permission to ignore something else. One acknowledged concern excuses inaction elsewhere." },
-    { value: "outrage_economy", label: "Outrage economy", desc: "Someone profits when you're activated — algorithmically, politically, financially. Your attention is their product." },
+    { value: "outrage_economy", label: "Outrage economy", desc: "Someone profits when you're activated: algorithmically, politically, financially. Your attention is their product." },
     { value: "purity_trap", label: "Purity trap", desc: "Holding out for a clean option that doesn't exist leads to inaction. Perfect becomes the enemy of better." },
     { value: "proportionality", label: "Proportionality mismatch", desc: "Reaction intensity may map to visibility rather than actual scale of harm. These often diverge." },
     { value: "halflife", label: "Half-life doubt", desc: "Not sure you'll still care in a year. This might be a social moment more than a sustained moral position." },
   ]},
   { id: "counterfactual", num: "05", chapter: "Analysis", title: "If this didn't exist, what would?", subtitle: "Most critiques assume the alternative is clean. Rarely true. What actually fills the gap?", type: "text", placeholder: "e.g. more fossil fuel infrastructure, worse labor conditions elsewhere..." },
   { id: "who_profits", num: "06", chapter: "Analysis", title: "Who benefits from your outrage?",
-    primer: "Every platform, publication, and political faction has a financial incentive to keep you activated. Anger drives engagement. Engagement drives revenue. This isn't conspiracy — it's the business model. Your outrage is a product being sold.",
-    subtitle: "Name the specific players — platforms, industries, politicians, media outlets.", type: "text", placeholder: "e.g. the competing platform, the politician who needs an enemy, the outlet that monetizes anger..." },
+    primer: "Every platform, publication, and political faction has a financial incentive to keep you activated. Anger drives engagement. Engagement drives revenue. This isn't conspiracy. It's the business model. Your outrage is a product being sold.",
+    subtitle: "Name the specific players: platforms, industries, politicians, media outlets.", type: "text", placeholder: "e.g. the competing platform, the politician who needs an enemy, the outlet that monetizes anger..." },
   { id: "action", num: "07", chapter: "Action", title: "What are you actually doing about this?", subtitle: "Not judging the answer. Just mapping the gap between concern and action.", type: "choice", options: [{ value: "voicing", label: "Posting, talking, sharing outrage online" }, { value: "consuming", label: "Changing my own purchasing or usage" }, { value: "organizing", label: "Involved in policy, organizing, or building alternatives" }, { value: "nothing", label: "Honestly, nothing yet" }] },
   { id: "leverage", num: "08", chapter: "Action", title: "What would actually move the needle?", subtitle: "Not what feels good. What has a realistic causal path to the change you want?", type: "text", placeholder: "e.g. specific legislation, shifting procurement, funding alternatives..." },
   { id: "agency", num: "09", chapter: "Action", title: "What's within your actual power?", subtitle: "Outrage often targets things with zero personal leverage. What can you actually change from where you stand?", type: "text", placeholder: "e.g. my purchasing, my professional choices, my local policy environment..." },
@@ -23,21 +23,21 @@ const STEPS = [
 
 const CONSISTENCY = {
   same: { label: "Consistent Scope", color: "#4a7c59", bg: "rgba(74,124,89,0.08)", text: "You're applying concern consistently across structurally similar cases. That's less common than it sounds, and it makes your critique harder to dismiss. The question now is whether your actions match your stated values." },
-  different: { label: "Selective Attention", color: "#b07d2e", bg: "rgba(176,125,46,0.08)", text: "You feel more strongly about one case than a structurally similar one. This might reflect genuine differences in scale or urgency — or it might be visibility bias. The twin you named is worth sitting with." },
-  unsure: { label: "Open Question", color: "#3a6ea8", bg: "rgba(58,110,168,0.08)", text: "Honest uncertainty is a useful starting point. The structurally identical case might be meaningfully different in ways you haven't articulated yet — or the discomfort of not knowing might be pointing at something real." },
+  different: { label: "Selective Attention", color: "#b07d2e", bg: "rgba(176,125,46,0.08)", text: "You feel more strongly about one case than a structurally similar one. This might reflect genuine differences in scale or urgency, or it might be visibility bias. The twin you named is worth sitting with." },
+  unsure: { label: "Open Question", color: "#3a6ea8", bg: "rgba(58,110,168,0.08)", text: "Honest uncertainty is a useful starting point. The structurally identical case might be meaningfully different in ways you haven't articulated yet. Or the discomfort of not knowing might be pointing at something real." },
 };
 
 const ACTION_MAP = {
-  voicing: { label: "Low-to-medium leverage", color: "#b07d2e", text: "Raising awareness creates real effects — but only if it moves someone toward action. Does this post change behavior, or does it signal values? Both happen. Being honest about which is doing more work matters." },
+  voicing: { label: "Low-to-medium leverage", color: "#b07d2e", text: "Raising awareness creates real effects, but only if it moves someone toward action. Does this post change behavior, or does it signal values? Both happen. Being honest about which is doing more work matters." },
   consuming: { label: "Medium leverage", color: "#3a6ea8", text: "Individual consumption choices send real market signals, especially at scale. Limited alone, but not nothing. Most effective when combined with collective action." },
   organizing: { label: "High leverage", color: "#4a7c59", text: "Structural change happens here. Policy, organizing, and building alternatives are the mechanisms that actually shift systems. You're in the highest-impact tier." },
-  nothing: { label: "Honest starting point", color: "#888", text: "Most people are here. The gap between concern and action isn't usually laziness — it's that the action path isn't visible yet. That's fixable." },
+  nothing: { label: "Honest starting point", color: "#888", text: "Most people are here. The gap between concern and action isn't usually laziness. The action path just isn't visible yet. That's fixable." },
 };
 
 const BIAS_NOTES = {
-  identifiable_victim: "Your concern may be calibrated to visibility rather than scale. The harm that has a face feels more urgent than equivalent harm that doesn't — which is human, and worth accounting for.",
+  identifiable_victim: "Your concern may be calibrated to visibility rather than scale. The harm that has a face feels more urgent than equivalent harm that doesn't. That's human, and worth accounting for.",
   moral_licensing: "Watch for the pattern where caring about this becomes a reason not to examine adjacent areas. One acknowledged concern doesn't clear the ledger.",
-  outrage_economy: "Someone is profiting from your activation. That doesn't make your concern wrong — but knowing who benefits is relevant information about the environment you're operating in.",
+  outrage_economy: "Someone is profiting from your activation. That doesn't make your concern wrong, but knowing who benefits is relevant information about the environment you're operating in.",
   purity_trap: "If no available option is clean enough to support, you may be optimizing for personal innocence rather than actual impact. Complicity in a flawed system while working to change it is often the only path.",
   proportionality: "Check whether your reaction intensity maps to actual harm scale or to how legible and visible the harm is. These often diverge, especially for harms that are new or heavily covered.",
   halflife: "Short-term concern isn't always invalid. But if this is more social moment than sustained position, naming that honestly is useful.",
@@ -50,20 +50,20 @@ const PRIMER_CARDS = [
   },
   {
     title: "The attention economy runs on outrage",
-    body: "Every platform, publication, and political faction has a financial incentive to keep you activated. Anger drives engagement. Engagement drives revenue. This isn't conspiracy — it's the business model. Your outrage is a product being sold.",
+    body: "Every platform, publication, and political faction has a financial incentive to keep you activated. Anger drives engagement. Engagement drives revenue. This isn't conspiracy. It's the business model. Your outrage is a product being sold.",
     deepDive: [
-      { num: "01", title: "Your attention is the product", body: "Platforms don't sell you things. They sell you — your attention, your time, your behavior — to advertisers. The more time you spend on platform, the more ad inventory they have to sell. You are not the customer. You are the commodity." },
-      { num: "02", title: "Engagement is the proxy metric", body: "Platforms can't directly sell 'attention' so they optimize for what they can measure: clicks, shares, comments, time on page. Whatever drives engagement gets amplified. Whatever doesn't gets buried. The metric is not 'what matters' — it's 'what sticks.'" },
-      { num: "03", title: "Outrage is the highest-engagement emotion", body: "Not happiness. Not inspiration. Outrage. Research on social media sharing consistently shows that moral-emotional language — anger, disgust, indignation — spreads faster and further than neutral content. The algorithm didn't plan this. It just learned it." },
-      { num: "04", title: "The algorithm has no ideology", body: "This is the part people miss. The algorithm isn't left or right, pro or anti anything. It optimizes for engagement. If outrage about Topic A gets more engagement than outrage about Topic B, Topic A gets amplified — regardless of which harm is actually worse or more important." },
+      { num: "01", title: "Your attention is the product", body: "Platforms don't sell you things. They sell you to advertisers: your attention, your time, your behavior. The more time you spend on platform, the more ad inventory they have to sell. You are not the customer. You are the commodity." },
+      { num: "02", title: "Engagement is the proxy metric", body: "Platforms can't directly sell 'attention' so they optimize for what they can measure: clicks, shares, comments, time on page. Whatever drives engagement gets amplified. Whatever doesn't gets buried. The metric is not 'what matters.' It's 'what sticks.'" },
+      { num: "03", title: "Outrage is the highest-engagement emotion", body: "Not happiness. Not inspiration. Outrage. Research on social media sharing consistently shows that moral-emotional language (anger, disgust, indignation) spreads faster and further than neutral content. The algorithm didn't plan this. It just learned it." },
+      { num: "04", title: "The algorithm has no ideology", body: "This is the part people miss. The algorithm isn't left or right, pro or anti anything. It optimizes for engagement. If outrage about Topic A gets more engagement than outrage about Topic B, Topic A gets amplified, regardless of which harm is actually worse or more important." },
       { num: "05", title: "Political actors figured this out", body: "Fundraising emails, political ads, and media coverage all follow the same logic. An enemy that activates your base raises more money than a complicated policy argument. Outrage is a fundraising mechanism. The enemy is often chosen for emotional resonance, not actual importance." },
       { num: "06", title: "The feedback loop tightens over time", body: "You see outrage content → you engage → the algorithm shows you more → your sense of what matters gets calibrated to what's most charged → you generate more outrage content → repeat. After months or years in this loop, your moral map of the world reflects engagement patterns, not reality." },
-      { num: "07", title: "Slow harms become invisible", body: "Things that don't generate outrage — structural, undramatic, slow-moving harms — get algorithmically starved. Not suppressed, just given no oxygen. Cobalt mining doesn't trend. A supply chain audit doesn't go viral. The absence of visibility gets misread as the absence of harm." },
+      { num: "07", title: "Slow harms become invisible", body: "Structural, undramatic, slow-moving harms get algorithmically starved. Not suppressed, just given no oxygen. Cobalt mining doesn't trend. A supply chain audit doesn't go viral. The absence of visibility gets misread as the absence of harm." },
     ]
   },
   {
     title: "Feeling strongly is not the same as acting effectively",
-    body: "Moral concern and moral leverage are different things. Posting, sharing, and feeling activated can substitute for action — giving a sense of having done something when the needle hasn't moved. The question worth asking is always: what's the causal path to actual change?"
+    body: "Moral concern and moral leverage are different things. Posting, sharing, and feeling activated can substitute for action, giving a sense of having done something when the needle hasn't moved. The question worth asking is always: what's the causal path to actual change?"
   },
 ];
 
@@ -74,7 +74,7 @@ function buildPositionStatement(answers) {
   if (structural_twin) para += ` I acknowledge that ${structural_twin} represents a structurally similar harm that deserves equal attention.`;
   if (feeling_diff === "same") para += " I hold this concern consistently across structurally similar cases.";
   else if (feeling_diff === "different") para += " I recognize that I apply this concern unevenly, which is worth examining.";
-  if (flags.length > 0) para += ` I have identified ${flags.length === 1 ? "a pattern" : "patterns"} — ${flags.map(f => f.replace(/_/g, " ")).join(", ")} — that may be shaping how I hold this concern.`;
+  if (flags.length > 0) para += ` I have identified ${flags.length === 1 ? "a pattern" : "patterns"} (${flags.map(f => f.replace(/_/g, " ")).join(", ")}) that may be shaping how I hold this concern.`;
   if (counterfactual) para += ` The realistic alternative would be ${counterfactual}, which is not a clean baseline.`;
   if (agency) para += ` Within my own sphere, I can act on: ${agency}.`;
   if (leverage) para += ` The action most likely to create real change is: ${leverage}.`;
@@ -224,8 +224,8 @@ export default function App() {
         {phase === "intro" && (
           <div className="au">
             <p style={{ fontFamily: serif, fontSize: "1.05rem", lineHeight: 1.85, color: "#444", marginBottom: "1.25rem", fontStyle: "italic" }}>Outrage is easy. Consistent, actionable concern is harder.</p>
-            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: ".75rem" }}>This tool helps you examine the scope and leverage of a moral critique — not to dismiss it, but to sharpen it. Nine questions covering consistency, cognitive bias, counterfactuals, and real leverage.</p>
-            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: "2rem" }}>At the end you'll get a clear statement of your actual position — built from your own answers, no AI involved — plus tools to share or print it.</p>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: ".75rem" }}>This tool helps you examine the scope and leverage of a moral critique: not to dismiss it, but to sharpen it. Nine questions covering consistency, cognitive bias, counterfactuals, and real leverage.</p>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: "2rem" }}>At the end you'll get a clear statement of your actual position, built from your own answers, no AI involved. Plus tools to share or print it.</p>
             <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", marginBottom: "2rem" }}>
               {chapters.map(ch => <span key={ch} style={{ fontSize: ".62rem", letterSpacing: ".12em", textTransform: "uppercase", border: "1px solid #ccc9c0", padding: ".28rem .65rem", color: "#999" }}>{ch}</span>)}
             </div>
@@ -338,7 +338,7 @@ export default function App() {
                       </div>
                     ))}
                   </div>
-                  <p style={{ fontSize: ".73rem", color: faint, marginBottom: "1rem" }}>Select none, some, or all — whatever's honest.</p>
+                  <p style={{ fontSize: ".73rem", color: faint, marginBottom: "1rem" }}>Select none, some, or all. Whatever's honest.</p>
                 </>
               )}
 
