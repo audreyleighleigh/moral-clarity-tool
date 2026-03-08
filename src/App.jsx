@@ -117,11 +117,11 @@ const biasOptionMap = Object.fromEntries(
 const CONSISTENCY = {
   same: { label: "Consistent Scope", color: "#4a7c59", bg: "rgba(74,124,89,0.08)", text: "You're applying concern consistently across structurally similar cases. That's less common than it sounds, and it makes your critique harder to dismiss. The question now is whether your actions match your stated values." },
   different: { label: "Selective Attention", color: "#b07d2e", bg: "rgba(176,125,46,0.08)", text: "You feel more strongly about one case than a structurally similar one. This might reflect genuine differences in scale or urgency, or it might be a visibility effect. The parallel case you named is worth returning to." },
-  unsure: { label: "Open Question", color: "#3a6ea8", bg: "rgba(58,110,168,0.08)", text: "Honest uncertainty is a useful starting point. The structurally identical case might be meaningfully different in ways you haven't articulated yet. Or the discomfort of not knowing might be pointing at something real." },
+  unsure: { label: "Open Question", color: "#3a6ea8", bg: "rgba(58,110,168,0.08)", text: "Honest uncertainty is a useful starting point. The parallel case you named might be meaningfully different from your original concern in ways you haven't fully worked out yet. Or the fact that you're unsure might itself be pointing at a genuine inconsistency worth examining." },
 };
 
 const ACTION_MAP = {
-  voicing: { label: "Low-to-medium leverage", color: "#b07d2e", text: "Raising awareness creates real effects, but only if it moves someone toward action. Does this post change behavior, or does it signal values? Both happen. Being honest about which is doing more work matters." },
+  voicing: { label: "Low-to-medium leverage", color: "#b07d2e", text: "Raising awareness creates real effects, but only if it moves someone toward action. It's worth being honest about whether this post is more likely to change what someone does, or to communicate what you believe. Both happen. But they're different things." },
   consuming: { label: "Medium leverage", color: "#3a6ea8", text: "Individual consumption choices send real market signals, especially at scale. Limited alone, but not nothing. Most effective when combined with collective action." },
   organizing: { label: "High leverage", color: "#4a7c59", text: "Structural change happens here. Policy, organizing, and building alternatives are the mechanisms that actually shift systems. You're in the highest-impact tier." },
   nothing: { label: "Honest starting point", color: "#888", text: "Most people are here. The gap between concern and action isn't usually laziness. The action path just isn't visible yet. That's fixable." },
@@ -139,7 +139,7 @@ const BIAS_NOTES = {
 const PRIMER_CARDS = [
   {
     title: "Visibility isn't the same as severity",
-    body: "The harms we hear about most are not necessarily the worst harms. They're the ones that are new, legible, and attached to recognizable faces or brands. Supply chains have been brutal for decades. They just don't trend."
+    body: "The harms we hear about most are not necessarily the worst harms. They tend to be the ones that are recent, legible, and attached to recognizable faces or brands. Take supply chain labor conditions as an example: serious abuses have been documented for decades, affecting millions of workers. But because the harm is slow, distributed, and faceless, it rarely makes the news cycle. The absence of coverage gets misread as the absence of severity."
   },
   {
     title: "The attention economy runs on outrage",
@@ -156,7 +156,7 @@ const PRIMER_CARDS = [
   },
   {
     title: "Feeling strongly is not the same as acting effectively",
-    body: "Moral concern and moral leverage are different things. Posting, sharing, and feeling activated can substitute for action, giving a sense of having done something when the needle hasn't moved. The question worth asking is always: what's the causal path to actual change?"
+    body: "Moral concern and practical impact are different things. Posting, sharing, and feeling activated can substitute for action, producing a sense of having done something even when nothing has changed. The question worth asking is: what would actually move this forward, and is what you're currently doing one of those things?"
   },
 ];
 
@@ -424,7 +424,8 @@ export default function App() {
         {/* PRIMER */}
         {phase === "primer" && (
           <div className="au">
-            {lbl("Three things worth knowing first", { marginBottom: "1.25rem", color: accent })}
+            {lbl("Three things worth knowing first", { marginBottom: ".6rem", color: accent })}
+            <p style={{ fontSize: ".86rem", lineHeight: 1.75, color: mid, marginBottom: "1.5rem" }}>These are three patterns that shape how moral concern works in practice. They give context to several of the questions that follow.</p>
             {PRIMER_CARDS.map((card, i) => (
               <div key={i} style={{ marginBottom: ".6rem" }}>
                 <div className="pc" onClick={() => setExpandedCard(expandedCard === i ? null : i)}>
