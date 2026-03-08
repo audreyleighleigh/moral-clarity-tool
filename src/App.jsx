@@ -231,8 +231,8 @@ export default function App() {
             </div>
             {rule}
             <div style={{ display: "flex", gap: ".75rem", alignItems: "center", flexWrap: "wrap", marginBottom: "1rem" }}>
-              <button className="bp" onClick={startSteps}>Begin Audit →</button>
               <button className="bg np" onClick={() => setPhase("primer")}>Read the primer first</button>
+              <button className="bp" onClick={startSteps}>Begin Audit →</button>
             </div>
             <p style={{ fontSize: ".73rem", color: faint }}>9 questions · ~5 min · no AI</p>
           </div>
