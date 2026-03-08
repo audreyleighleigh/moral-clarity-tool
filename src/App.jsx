@@ -1,25 +1,118 @@
 import { useState } from "react";
 
+const QUALITY_CHECK_FIELDS = ["structural_twin", "who_profits", "leverage", "agency"];
+const VAGUE_TERMS = ["corporations", "the government", "government", "everyone", "vote", "society", "big tech", "the media", "companies", "people", "them", "politicians", "tech companies", "the system", "capitalism", "media", "they", "others"];
+
 const STEPS = [
-  { id: "concern", num: "01", chapter: "Scope", title: "What are you critiquing?", subtitle: "Be specific. A technology, a company, an industry, a practice. Vague concern is hard to act on.", type: "text", placeholder: "e.g. AI data centers' energy consumption" },
-  { id: "structural_twin", num: "02", chapter: "Scope", title: "Name something structurally identical that gets less attention.", subtitle: "Same harm category, different visibility. If you can't name one, that's data. If you can but feel differently, that's worth sitting with.", type: "text", placeholder: "e.g. cobalt mining for EV batteries and laptops" },
-  { id: "feeling_diff", num: "03", chapter: "Scope", title: "Do you feel the same way about both?", subtitle: "No judgment. Noticing the gap is the whole point.", type: "choice", options: [{ value: "same", label: "Yes, my concern is consistent" }, { value: "different", label: "No, I feel more strongly about the first" }, { value: "unsure", label: "Honestly not sure" }] },
-  { id: "bias_flags", num: "04", chapter: "Bias Check", title: "Which of these might be shaping your concern?", subtitle: "Check everything that could apply. These are universal cognitive patterns, not accusations.", type: "multiselect", options: [
-    { value: "identifiable_victim", label: "Identifiable victim effect", desc: "The harm feels more real because it has a face or story. We respond more to one named person than to 10,000 statistics." },
-    { value: "moral_licensing", label: "Moral licensing", desc: "Caring about this gives psychological permission to ignore something else. One acknowledged concern excuses inaction elsewhere." },
-    { value: "outrage_economy", label: "Outrage economy", desc: "Someone profits when you're activated: algorithmically, politically, financially. Your attention is their product." },
-    { value: "purity_trap", label: "Purity trap", desc: "Holding out for a clean option that doesn't exist leads to inaction. Perfect becomes the enemy of better." },
-    { value: "proportionality", label: "Proportionality mismatch", desc: "Reaction intensity may map to visibility rather than actual scale of harm. These often diverge." },
-    { value: "halflife", label: "Half-life doubt", desc: "Not sure you'll still care in a year. This might be a social moment more than a sustained moral position." },
-  ]},
-  { id: "counterfactual", num: "05", chapter: "Analysis", title: "If this didn't exist, what would?", subtitle: "Most critiques assume the alternative is clean. Rarely true. What actually fills the gap?", type: "text", placeholder: "e.g. more fossil fuel infrastructure, worse labor conditions elsewhere..." },
-  { id: "who_profits", num: "06", chapter: "Analysis", title: "Who benefits from your outrage?",
+  {
+    id: "concern", num: "01", chapter: "Scope",
+    title: "What are you critiquing?",
+    subtitle: "Be specific. A technology, a company, an industry, a practice. Vague concern is hard to act on.",
+    type: "text", placeholder: "e.g. AI data centers' energy consumption"
+  },
+  {
+    id: "structural_twin", num: "02", chapter: "Scope",
+    title: "Name something structurally identical that gets less attention.",
+    subtitle: "Same harm category, different visibility. If you can't name one, that's data. If you can but feel differently, that's worth sitting with.",
+    type: "text", placeholder: "e.g. cobalt mining for EV batteries and laptops"
+  },
+  {
+    id: "feeling_diff", num: "03", chapter: "Scope",
+    title: "Do you feel the same way about both?",
+    subtitle: "No judgment. Noticing the gap is the whole point.",
+    type: "choice",
+    options: [
+      { value: "same", label: "Yes, my concern is consistent" },
+      { value: "different", label: "No, I feel more strongly about the first" },
+      { value: "unsure", label: "Honestly not sure" }
+    ]
+  },
+  {
+    id: "bias_flags", num: "04", chapter: "Bias Check",
+    title: "Which of these might be shaping your concern?",
+    subtitle: "Check everything that could apply. These are universal cognitive patterns, not accusations.",
+    type: "multiselect",
+    options: [
+      {
+        value: "identifiable_victim", label: "Identifiable victim effect",
+        desc: "The harm feels more real because it has a face or story. We respond more to one named person than to 10,000 statistics.",
+        extended: "The identifiable victim effect is one of the most robust findings in behavioral economics. Paul Slovic documented it as the collapse of compassion: we give more to save one named child than to save eight. The same pattern runs through moral outrage. A company harming someone with a name and face gets more attention than equivalent harm distributed across thousands of faceless workers. This isn't a failure of empathy. It's how empathy works.",
+        example: "Sweatshop conditions for a specific brand go viral after one worker's story surfaces. Structurally identical conditions at competing brands, without the human face, go unexamined."
+      },
+      {
+        value: "moral_licensing", label: "Moral licensing",
+        desc: "Caring about this gives psychological permission to ignore something else. One acknowledged concern excuses inaction elsewhere.",
+        extended: "Moral licensing shows up as a compensation effect: people who perform a virtuous act feel licensed to be less virtuous afterward. In the outrage context, posting about a cause can produce a feeling of having done something, even when the needle hasn't moved. The social signal replaces material action. It can also license ignoring structurally identical problems that haven't received the same cultural spotlight.",
+        example: "Shared a thread about supply chain labor conditions. Felt good about it. Went back to purchasing from the same supply chain without further examination."
+      },
+      {
+        value: "outrage_economy", label: "Outrage economy",
+        desc: "Someone profits when you're activated: algorithmically, politically, financially. Your attention is their product.",
+        extended: "The outrage economy operates at multiple levels simultaneously. Media outlets monetize engagement. Algorithms amplify high-engagement content. Political actors fundraise on enemy narratives. Advocacy organizations grow membership through fear. None of these actors necessarily want your problem solved. A solved problem ends the revenue stream. Understanding who benefits from your continued activation is basic media literacy.",
+        example: "A publication running outrage content about Tech Company A has major advertisers in that company's competitor space. The editorial and financial incentives align."
+      },
+      {
+        value: "purity_trap", label: "Purity trap",
+        desc: "Holding out for a clean option that doesn't exist leads to inaction. Perfect becomes the enemy of better.",
+        extended: "The purity trap is an unconscious optimization for personal innocence rather than actual impact. If no available option is clean enough to endorse, you can avoid all complicity but also all influence. Real change usually requires working within flawed systems. The people who moved the needle on labor standards, civil rights, and environmental regulation were often operating inside deeply compromised institutions. Clean hands and actual leverage rarely coexist.",
+        example: "Refused to vote for either candidate because both were flawed. The candidate considered more harmful won by less than 1% while the abstainer remained uncomplicit."
+      },
+      {
+        value: "proportionality", label: "Proportionality mismatch",
+        desc: "Reaction intensity may map to visibility rather than actual scale of harm. These often diverge.",
+        extended: "Proportionality mismatch is structural, not personal. The information environment systematically amplifies recent, dramatic, and legible harms over slow, distributed, and invisible ones. This calibration error happens to everyone who consumes media. The correction isn't to feel less. It's to deliberately compare: how does this harm rank against structurally similar harms that don't trend? If you can't name comparable harms that receive less attention, your moral map may be closer to a media map than a harm map.",
+        example: "Significant outrage about a data breach affecting 500,000 people. Low awareness of water contamination affecting 2 million people in a less-covered region."
+      },
+      {
+        value: "halflife", label: "Half-life doubt",
+        desc: "Not sure you'll still care in a year. This might be a social moment more than a sustained moral position.",
+        extended: "Short-term moral concern isn't automatically invalid. Some social moments generate concern that leads to real change. The useful diagnostic: in a year, will you still be organized around this issue, or will the cycle have moved on? The distinction between a sustained position and a social moment is worth naming honestly. Taking action now, while concern is high, makes sense either way. But the type of action that makes sense depends on which this is.",
+        example: "Intense concern about a company's practices during a news cycle. Six months later: the company hasn't changed, the coverage has moved on, and so has the concern."
+      },
+    ]
+  },
+  {
+    id: "counterfactual", num: "05", chapter: "Analysis",
+    title: "If this didn't exist, what would?",
+    subtitle: "Most critiques assume the alternative is clean. Rarely true. What actually fills the gap?",
+    type: "text", placeholder: "e.g. more fossil fuel infrastructure, worse labor conditions elsewhere..."
+  },
+  {
+    id: "who_profits", num: "06", chapter: "Analysis",
+    title: "Who benefits from your outrage?",
     primer: "Every platform, publication, and political faction has a financial incentive to keep you activated. Anger drives engagement. Engagement drives revenue. This isn't conspiracy. It's the business model. Your outrage is a product being sold.",
-    subtitle: "Name the specific players: platforms, industries, politicians, media outlets.", type: "text", placeholder: "e.g. the competing platform, the politician who needs an enemy, the outlet that monetizes anger..." },
-  { id: "action", num: "07", chapter: "Action", title: "What are you actually doing about this?", subtitle: "Not judging the answer. Just mapping the gap between concern and action.", type: "choice", options: [{ value: "voicing", label: "Posting, talking, sharing outrage online" }, { value: "consuming", label: "Changing my own purchasing or usage" }, { value: "organizing", label: "Involved in policy, organizing, or building alternatives" }, { value: "nothing", label: "Honestly, nothing yet" }] },
-  { id: "leverage", num: "08", chapter: "Action", title: "What would actually move the needle?", subtitle: "Not what feels good. What has a realistic causal path to the change you want?", type: "text", placeholder: "e.g. specific legislation, shifting procurement, funding alternatives..." },
-  { id: "agency", num: "09", chapter: "Action", title: "What's within your actual power?", subtitle: "Outrage often targets things with zero personal leverage. What can you actually change from where you stand?", type: "text", placeholder: "e.g. my purchasing, my professional choices, my local policy environment..." },
+    subtitle: "Name the specific players: platforms, industries, politicians, media outlets.",
+    type: "text", placeholder: "e.g. the competing platform, the politician who needs an enemy, the outlet that monetizes anger..."
+  },
+  {
+    id: "action", num: "07", chapter: "Action",
+    title: "What are you actually doing about this?",
+    subtitle: "Not judging the answer. Just mapping the gap between concern and action.",
+    type: "choice",
+    options: [
+      { value: "voicing", label: "Posting, talking, sharing outrage online" },
+      { value: "consuming", label: "Changing my own purchasing or usage" },
+      { value: "organizing", label: "Involved in policy, organizing, or building alternatives" },
+      { value: "nothing", label: "Honestly, nothing yet" }
+    ]
+  },
+  {
+    id: "leverage", num: "08", chapter: "Action",
+    title: "What would actually move the needle?",
+    subtitle: "Not what feels good. What has a realistic causal path to the change you want?",
+    type: "text", placeholder: "e.g. specific legislation, shifting procurement, funding alternatives..."
+  },
+  {
+    id: "agency", num: "09", chapter: "Action",
+    title: "What's within your actual power?",
+    subtitle: "Outrage often targets things with zero personal leverage. What can you actually change from where you stand?",
+    type: "text", placeholder: "e.g. my purchasing, my professional choices, my local policy environment..."
+  },
 ];
+
+const biasOptionMap = Object.fromEntries(
+  STEPS.find(s => s.id === "bias_flags").options.map(o => [o.value, o])
+);
 
 const CONSISTENCY = {
   same: { label: "Consistent Scope", color: "#4a7c59", bg: "rgba(74,124,89,0.08)", text: "You're applying concern consistently across structurally similar cases. That's less common than it sounds, and it makes your critique harder to dismiss. The question now is whether your actions match your stated values." },
@@ -57,7 +150,7 @@ const PRIMER_CARDS = [
       { num: "03", title: "Outrage is the highest-engagement emotion", body: "Not happiness. Not inspiration. Outrage. Research on social media sharing consistently shows that moral-emotional language (anger, disgust, indignation) spreads faster and further than neutral content. The algorithm didn't plan this. It just learned it." },
       { num: "04", title: "The algorithm has no ideology", body: "This is the part people miss. The algorithm isn't left or right, pro or anti anything. It optimizes for engagement. If outrage about Topic A gets more engagement than outrage about Topic B, Topic A gets amplified, regardless of which harm is actually worse or more important." },
       { num: "05", title: "Political actors figured this out", body: "Fundraising emails, political ads, and media coverage all follow the same logic. An enemy that activates your base raises more money than a complicated policy argument. Outrage is a fundraising mechanism. The enemy is often chosen for emotional resonance, not actual importance." },
-      { num: "06", title: "The feedback loop tightens over time", body: "You see outrage content → you engage → the algorithm shows you more → your sense of what matters gets calibrated to what's most charged → you generate more outrage content → repeat. After months or years in this loop, your moral map of the world reflects engagement patterns, not reality." },
+      { num: "06", title: "The feedback loop tightens over time", body: "You see outrage content, you engage, the algorithm shows you more, your sense of what matters gets calibrated to what's most charged, you generate more outrage content, repeat. After months or years in this loop, your moral map of the world reflects engagement patterns, not reality." },
       { num: "07", title: "Slow harms become invisible", body: "Structural, undramatic, slow-moving harms get algorithmically starved. Not suppressed, just given no oxygen. Cobalt mining doesn't trend. A supply chain audit doesn't go viral. The absence of visibility gets misread as the absence of harm." },
     ]
   },
@@ -67,18 +160,83 @@ const PRIMER_CARDS = [
   },
 ];
 
+function isVagueAnswer(text) {
+  const words = text.trim().split(/\s+/);
+  if (words.length < 6) return true;
+  const lower = text.toLowerCase();
+  return VAGUE_TERMS.some(t => lower.includes(t));
+}
+
+function isLowEngagement(answers) {
+  const textFields = ["structural_twin", "who_profits", "leverage", "agency", "counterfactual"];
+  const shortCount = textFields.filter(f => {
+    const val = answers[f];
+    return val && val.trim().split(/\s+/).length < 8;
+  }).length;
+  const noFlags = !answers.bias_flags || answers.bias_flags.length === 0;
+  const voicing = answers.action === "voicing";
+  return shortCount >= 3 && noFlags && voicing;
+}
+
+function hasLeverageGap(answers) {
+  if (!answers.leverage || !answers.agency) return false;
+  const systemicTerms = ["policy", "regulation", "legislation", "law", "system", "structural", "corporate", "industry", "government", "incentive", "mandate", "enforcement", "reform", "collective", "organizing", "lobbying"];
+  const personalTerms = ["my purchasing", "my choices", "my own", "my professional", "my local", "i can", "my buying", "my vote", "my consumption", "my spending"];
+  const lev = answers.leverage.toLowerCase();
+  const ag = answers.agency.toLowerCase();
+  const levSystemic = systemicTerms.some(t => lev.includes(t));
+  const agPersonal = personalTerms.some(t => ag.includes(t));
+  const agSystemic = systemicTerms.some(t => ag.includes(t));
+  return levSystemic && agPersonal && !agSystemic;
+}
+
 function buildPositionStatement(answers) {
   const { concern, structural_twin, feeling_diff, counterfactual, leverage, agency, bias_flags } = answers;
   const flags = bias_flags || [];
-  let para = `I am concerned about ${concern || "this issue"}.`;
-  if (structural_twin) para += ` I acknowledge that ${structural_twin} represents a structurally similar harm that deserves equal attention.`;
-  if (feeling_diff === "same") para += " I hold this concern consistently across structurally similar cases.";
-  else if (feeling_diff === "different") para += " I recognize that I apply this concern unevenly, which is worth examining.";
-  if (flags.length > 0) para += ` I have identified ${flags.length === 1 ? "a pattern" : "patterns"} (${flags.map(f => f.replace(/_/g, " ")).join(", ")}) that may be shaping how I hold this concern.`;
-  if (counterfactual) para += ` The realistic alternative would be ${counterfactual}, which is not a clean baseline.`;
-  if (agency) para += ` Within my own sphere, I can act on: ${agency}.`;
-  if (leverage) para += ` The action most likely to create real change is: ${leverage}.`;
+  const topic = concern || "this issue";
+  let para = "";
+  if (feeling_diff === "same") {
+    para = `I am concerned about ${topic}, and I hold that concern consistently across structurally similar cases.`;
+    if (structural_twin) para += ` I acknowledge that ${structural_twin} represents comparable harm deserving equal attention.`;
+    if (flags.length > 0) para += ` I have identified ${flags.length === 1 ? "a pattern" : "patterns"} (${flags.map(f => f.replace(/_/g, " ")).join(", ")}) that may be shaping how I hold this concern, and I'm accounting for them.`;
+    if (counterfactual) para += ` The realistic alternative, ${counterfactual}, is not a clean baseline.`;
+    if (agency) para += ` Within my own sphere, I can act on: ${agency}.`;
+    if (leverage) para += ` What would actually move the needle: ${leverage}.`;
+  } else if (feeling_diff === "different") {
+    para = `I am concerned about ${topic}, though I recognize I apply this concern unevenly.`;
+    if (structural_twin) para += ` I feel more strongly about this than ${structural_twin}, even though they share the same structural harm category. That asymmetry is worth examining.`;
+    if (flags.length > 0) para += ` I've flagged ${flags.length === 1 ? "a pattern" : "patterns"} (${flags.map(f => f.replace(/_/g, " ")).join(", ")}) that may account for part of that gap.`;
+    if (counterfactual) para += ` The realistic alternative, ${counterfactual}, is not clean.`;
+    if (agency) para += ` What I can actually do: ${agency}.`;
+    if (leverage) para += ` What would actually move the needle: ${leverage}.`;
+  } else {
+    para = `I am concerned about ${topic}, and I'm still working out how consistently I hold that concern.`;
+    if (structural_twin) para += ` The structural parallel to ${structural_twin} raises questions I haven't fully resolved.`;
+    if (flags.length > 0) para += ` I've noticed ${flags.length === 1 ? "a pattern" : "patterns"} (${flags.map(f => f.replace(/_/g, " ")).join(", ")}) that may be shaping my perspective.`;
+    if (counterfactual) para += ` The realistic alternative is ${counterfactual}.`;
+    if (agency) para += ` What I can actually do: ${agency}.`;
+    if (leverage) para += ` What would create real change: ${leverage}.`;
+  }
   return para;
+}
+
+function buildShortStatement(answers) {
+  const { concern, feeling_diff, leverage } = answers;
+  const topic = concern || "this issue";
+  if (feeling_diff === "same") {
+    const leveragePart = leverage ? ` What would actually move the needle: ${leverage}.` : "";
+    return `I'm concerned about ${topic}, and I try to apply that concern consistently across similar cases.${leveragePart}`;
+  } else if (feeling_diff === "different") {
+    return `I'm concerned about ${topic}, though I notice I apply that concern more intensely here than in structurally similar cases. That's something I'm sitting with.`;
+  } else {
+    return `I'm concerned about ${topic}. I'm still working out whether my concern is consistent and where I have actual leverage.`;
+  }
+}
+
+function buildChallengeText(answers) {
+  const short = buildShortStatement(answers);
+  const url = typeof window !== "undefined" ? (window.location.origin + window.location.pathname) : "";
+  return `I just ran my position on ${answers.concern || "an issue"} through a moral clarity audit.\n\n"${short}"\n\nWant to test your own? 9 questions, no AI, about 5 minutes.\n${url}`;
 }
 
 function buildPlainText(answers) {
@@ -129,16 +287,27 @@ export default function App() {
   const [answers, setAnswers] = useState({});
   const [currentText, setCurrentText] = useState("");
   const [selectedMulti, setSelectedMulti] = useState([]);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(null);
+  const [showQualityWarning, setShowQualityWarning] = useState(false);
+  const [expandedFlag, setExpandedFlag] = useState(null);
 
   const current = STEPS[step];
   const progress = ((step + 1) / STEPS.length) * 100;
   const chapters = [...new Set(STEPS.map(s => s.chapter))];
 
-  const startSteps = () => { setPhase("steps"); setStep(0); setCurrentText(""); setSelectedMulti([]); };
+  const startSteps = () => {
+    setPhase("steps"); setStep(0); setCurrentText(""); setSelectedMulti([]); setShowQualityWarning(false);
+  };
 
-  const advance = (val) => {
+  const advance = (val, bypassQuality = false) => {
     const value = val !== undefined ? val : currentText;
+    if (current.type === "text" && QUALITY_CHECK_FIELDS.includes(current.id) && !bypassQuality) {
+      if (isVagueAnswer(value)) {
+        setShowQualityWarning(true);
+        return;
+      }
+    }
+    setShowQualityWarning(false);
     const newAnswers = { ...answers, [current.id]: value };
     setAnswers(newAnswers);
     if (step < STEPS.length - 1) {
@@ -147,11 +316,16 @@ export default function App() {
       setCurrentText(newAnswers[next?.id] || "");
       setSelectedMulti(newAnswers[next?.id] || []);
     } else {
-      setPhase("done");
+      if (isLowEngagement(newAnswers)) {
+        setPhase("check");
+      } else {
+        setPhase("done");
+      }
     }
   };
 
   const goBack = () => {
+    setShowQualityWarning(false);
     if (step === 0) { setPhase("intro"); return; }
     const prev = STEPS[step - 1];
     setStep(step - 1);
@@ -161,18 +335,27 @@ export default function App() {
 
   const reset = () => {
     setPhase("intro"); setStep(0); setAnswers({});
-    setCurrentText(""); setSelectedMulti([]); setCopied(false); setExpandedCard(null);
+    setCurrentText(""); setSelectedMulti([]); setCopied(null);
+    setExpandedCard(null); setShowQualityWarning(false); setExpandedFlag(null);
   };
+
   const toggleMulti = (val) => setSelectedMulti(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(buildPlainText(answers)).then(() => {
-      setCopied(true); setTimeout(() => setCopied(false), 2500);
+
+  const copyText = (type) => {
+    const url = window.location.origin + window.location.pathname;
+    let text;
+    if (type === "position") text = buildShortStatement(answers) + "\n\n" + url;
+    else if (type === "challenge") text = buildChallengeText(answers);
+    else text = buildPlainText(answers);
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(type); setTimeout(() => setCopied(null), 2500);
     });
   };
 
   const cr = CONSISTENCY[answers.feeling_diff] || CONSISTENCY.unsure;
   const ar = ACTION_MAP[answers.action] || ACTION_MAP.nothing;
   const flaggedBiases = answers.bias_flags || [];
+  const leverageGap = hasLeverageGap(answers);
 
   const serif = "Georgia, 'Times New Roman', serif";
   const sans = "'Helvetica Neue', Helvetica, Arial, sans-serif";
@@ -307,9 +490,24 @@ export default function App() {
               <p style={{ fontSize: ".86rem", color: mid, lineHeight: 1.75, marginBottom: "1.5rem" }}>{current.subtitle}</p>
 
               {current.type === "text" && (
-                <textarea value={currentText} onChange={e => setCurrentText(e.target.value)}
-                  placeholder={current.placeholder}
-                  onKeyDown={e => { if (e.key === "Enter" && e.metaKey && currentText.trim()) advance(); }} />
+                <>
+                  <textarea
+                    value={currentText}
+                    onChange={e => { setCurrentText(e.target.value); setShowQualityWarning(false); }}
+                    placeholder={current.placeholder}
+                    onKeyDown={e => { if (e.key === "Enter" && e.metaKey && currentText.trim()) advance(); }}
+                  />
+                  {showQualityWarning && (
+                    <div style={{ background: "rgba(176,125,46,0.08)", border: "1px solid rgba(176,125,46,0.3)", padding: ".85rem 1rem", marginTop: ".5rem" }}>
+                      <p style={{ fontSize: ".8rem", color: "#b07d2e", lineHeight: 1.6, marginBottom: ".6rem" }}>This answer might be too brief or general to be useful. More specific answers produce clearer results.</p>
+                      <div style={{ display: "flex", gap: ".75rem", alignItems: "center" }}>
+                        <button className="bt" style={{ color: "#b07d2e" }} onClick={() => setShowQualityWarning(false)}>Add more detail</button>
+                        <span style={{ color: faint, fontSize: ".73rem" }}>or</span>
+                        <button className="bt" onClick={() => advance(undefined, true)}>That's my answer, continue</button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
               {current.type === "choice" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: ".45rem" }}>
@@ -353,13 +551,29 @@ export default function App() {
                   )}
                   {current.type === "multiselect" && (
                     <button className="bp" onClick={() => advance(selectedMulti)}>
-                      {selectedMulti.length === 0 ? "None apply → Continue" : "Continue →"}
+                      {selectedMulti.length === 0 ? "None apply, continue" : "Continue →"}
                     </button>
                   )}
                 </div>
               </div>
             </div>
           </>
+        )}
+
+        {/* CHECK (pushback interstitial) */}
+        {phase === "check" && (
+          <div className="au">
+            {lbl("Before your results", { color: accent, marginBottom: ".5rem" })}
+            <h2 style={{ fontFamily: serif, fontSize: "clamp(1.35rem,3.5vw,1.75rem)", fontWeight: 400, lineHeight: 1.3, marginBottom: "1.25rem" }}>One more check</h2>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: ".9rem" }}>Several of your answers were brief. This audit produces more useful results when the specifics are uncomfortable to name.</p>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: ".9rem" }}>The questions worth revisiting are usually: who specifically benefits from your outrage, what would actually move the needle (with a real causal path), and what's within your actual power (concretely, not generally).</p>
+            <p style={{ fontSize: ".9rem", lineHeight: 1.8, color: mid, marginBottom: "2rem" }}>You're also posting about this issue without having flagged any cognitive biases. That pattern is worth at least a second look.</p>
+            {rule}
+            <div style={{ display: "flex", gap: ".75rem", alignItems: "center", flexWrap: "wrap" }}>
+              <button className="bg" onClick={() => { setPhase("steps"); setStep(0); setShowQualityWarning(false); }}>Take another pass</button>
+              <button className="bp" onClick={() => setPhase("done")}>Continue to results →</button>
+            </div>
+          </div>
         )}
 
         {/* RESULTS */}
@@ -382,17 +596,51 @@ export default function App() {
               <p style={{ fontSize: ".86rem", lineHeight: 1.75, color: mid }}>{ar.text}</p>
             </div>
 
+            {/* Leverage gap */}
+            {leverageGap && (
+              <div style={{ padding: "1.25rem", background: "rgba(58,110,168,0.06)", border: "1px solid rgba(58,110,168,0.25)", marginBottom: "1.1rem" }}>
+                {lbl("Leverage gap", { marginBottom: ".4rem", color: "#3a6ea8" })}
+                <div style={{ fontWeight: 700, color: "#3a6ea8", fontSize: ".85rem", marginBottom: ".5rem" }}>Systemic lever, personal action</div>
+                <p style={{ fontSize: ".86rem", lineHeight: 1.75, color: mid }}>Your leverage answer points at systemic change. Your agency answer points at personal action. Those operate at different scales. What would it look like to connect your personal capacity to the systemic lever you named?</p>
+              </div>
+            )}
+
             {/* Bias flags */}
             {flaggedBiases.length > 0 && (
               <div style={{ marginBottom: "1.1rem" }}>
                 {lbl("Patterns you flagged", { marginBottom: ".75rem" })}
                 <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
-                  {flaggedBiases.map(f => (
-                    <div key={f} style={{ padding: "1rem", background: white, border: "1px solid #e0dbd0" }}>
-                      <div style={{ fontSize: ".8rem", fontWeight: 700, marginBottom: ".3rem", textTransform: "capitalize" }}>{f.replace(/_/g, " ")}</div>
-                      <p style={{ fontSize: ".8rem", color: mid, lineHeight: 1.65 }}>{BIAS_NOTES[f]}</p>
-                    </div>
-                  ))}
+                  {flaggedBiases.map(f => {
+                    const option = biasOptionMap[f];
+                    const isExpanded = expandedFlag === f;
+                    return (
+                      <div key={f} style={{ padding: "1rem", background: white, border: "1px solid #e0dbd0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: ".75rem" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: ".8rem", fontWeight: 700, marginBottom: ".3rem", textTransform: "capitalize" }}>{f.replace(/_/g, " ")}</div>
+                            <p style={{ fontSize: ".8rem", color: mid, lineHeight: 1.65 }}>{BIAS_NOTES[f]}</p>
+                          </div>
+                          <button
+                            className="bt"
+                            style={{ flexShrink: 0, fontSize: "1.1rem", lineHeight: 1, paddingTop: ".1rem" }}
+                            onClick={() => setExpandedFlag(isExpanded ? null : f)}
+                            aria-label={isExpanded ? "Collapse" : "Expand"}
+                          >
+                            {isExpanded ? "−" : "+"}
+                          </button>
+                        </div>
+                        {isExpanded && option && (
+                          <div style={{ borderTop: "1px solid #e8e4dc", paddingTop: ".75rem", marginTop: ".75rem" }}>
+                            <p style={{ fontSize: ".8rem", lineHeight: 1.75, color: mid, marginBottom: ".75rem" }}>{option.extended}</p>
+                            <div style={{ background: bg, border: "1px solid #e0dbd0", padding: ".75rem" }}>
+                              {lbl("Example", { marginBottom: ".3rem" })}
+                              <p style={{ fontSize: ".78rem", lineHeight: 1.65, color: "#666", fontStyle: "italic" }}>{option.example}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -402,19 +650,54 @@ export default function App() {
             {/* Position statement */}
             <div style={{ marginBottom: "1.75rem" }}>
               {lbl("Your position, stated clearly", { color: accent, marginBottom: ".75rem" })}
-              <blockquote style={{ fontFamily: serif, fontSize: "1rem", lineHeight: 1.85, color: ink, borderLeft: `3px solid ${accent}`, paddingLeft: "1.25rem", fontStyle: "italic", margin: 0 }}>
+              <blockquote style={{ fontFamily: serif, fontSize: "1rem", lineHeight: 1.85, color: ink, borderLeft: `3px solid ${accent}`, paddingLeft: "1.25rem", fontStyle: "italic", margin: 0, marginBottom: "1.1rem" }}>
                 "{buildPositionStatement(answers)}"
               </blockquote>
+              {lbl("Short version", { marginBottom: ".35rem" })}
+              <p style={{ fontSize: ".83rem", lineHeight: 1.7, color: mid, fontStyle: "italic" }}>
+                {buildShortStatement(answers)}
+              </p>
               <p style={{ fontSize: ".72rem", color: faint, marginTop: ".6rem" }}>Built from your answers. No AI involved.</p>
             </div>
 
             {rule}
 
             {/* Share actions */}
-            <div className="np" style={{ display: "flex", gap: ".75rem", flexWrap: "wrap", marginBottom: "1.25rem" }}>
-              <button className="bp" onClick={copyToClipboard}>{copied ? "Copied ✓" : "Copy Full Audit"}</button>
-              <button className="bg" onClick={() => window.print()}>Print / Save PDF</button>
-              <button className="bt" onClick={reset}>Start Over</button>
+            <div className="np" style={{ marginBottom: "1.25rem" }}>
+              {lbl("Share", { marginBottom: ".75rem" })}
+              <div style={{ display: "flex", flexDirection: "column", gap: ".5rem", marginBottom: "1rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".85rem 1rem", background: white, border: "1px solid #e0dbd0" }}>
+                  <div>
+                    <div style={{ fontSize: ".82rem", fontWeight: 600, marginBottom: ".15rem" }}>Share your position</div>
+                    <div style={{ fontSize: ".73rem", color: mid }}>Your short statement, ready to paste</div>
+                  </div>
+                  <button className="bp" style={{ whiteSpace: "nowrap", flexShrink: 0 }} onClick={() => copyText("position")}>
+                    {copied === "position" ? "Copied ✓" : "Copy"}
+                  </button>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".85rem 1rem", background: white, border: "1px solid #e0dbd0" }}>
+                  <div>
+                    <div style={{ fontSize: ".82rem", fontWeight: 600, marginBottom: ".15rem" }}>Challenge a friend</div>
+                    <div style={{ fontSize: ".73rem", color: mid }}>Your position plus a link to the tool</div>
+                  </div>
+                  <button className="bp" style={{ whiteSpace: "nowrap", flexShrink: 0 }} onClick={() => copyText("challenge")}>
+                    {copied === "challenge" ? "Copied ✓" : "Copy"}
+                  </button>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: ".85rem 1rem", background: white, border: "1px solid #e0dbd0" }}>
+                  <div>
+                    <div style={{ fontSize: ".82rem", fontWeight: 600, marginBottom: ".15rem" }}>Save for later</div>
+                    <div style={{ fontSize: ".73rem", color: mid }}>Full audit, plain text, ready to paste anywhere</div>
+                  </div>
+                  <button className="bp" style={{ whiteSpace: "nowrap", flexShrink: 0 }} onClick={() => copyText("full")}>
+                    {copied === "full" ? "Copied ✓" : "Copy"}
+                  </button>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: ".75rem", alignItems: "center" }}>
+                <button className="bg" onClick={() => window.print()}>Print / Save PDF</button>
+                <button className="bt" onClick={reset}>Start Over</button>
+              </div>
             </div>
           </div>
         )}
